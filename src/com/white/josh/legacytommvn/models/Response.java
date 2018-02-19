@@ -127,7 +127,7 @@ public class Response implements Serializable {
 		   .append("<")
 		   .append("/")
 		   .append(tagName)
-		   .append(">");
+		   .append(">\n");
 		return tag.toString();
 	}
 
