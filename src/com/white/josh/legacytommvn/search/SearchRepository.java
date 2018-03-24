@@ -1,7 +1,6 @@
 package com.white.josh.legacytommvn.search;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -45,10 +44,10 @@ public class SearchRepository {
 	}
 
 	public List<SearchResult> searchHashes(List<String> jarSHAs) {
-
 		List<SearchResult> results = new ArrayList<SearchResult>();
 		for (String sha : jarSHAs) {
 			SearchResult result = searchRepo(sha);
+			System.out.println(result);
 			if (result != null) {
 				results.add(result);
 			}
@@ -62,19 +61,14 @@ public class SearchRepository {
 	}
 
 	private SearchResult searchRepo(String hash) {
-		Reader reader = new InputStreamReader(makeRequest(getUrlWithHash(hash)));
-		return gson.fromJson(reader, SearchResult.class);
-	}
-
-	private InputStream makeRequest(String repoURL) {
-		InputStream reqStream = null;
-		try {
-			reqStream = executor.execute(Request.Get(repoURL).addHeader("accept", "application/json"))
-					.returnContent().asStream();
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		try (Reader reader = new InputStreamReader(executor
+				.execute(Request.Get(repoURL).addHeader("accept", "application/json")).returnContent().asStream())) {
+			return gson.fromJson(reader, SearchResult.class);
+		} catch (IOException e) {
+			System.err.println(e);
 		}
-		return reqStream;
+
+		return null;
 	}
 
 }
